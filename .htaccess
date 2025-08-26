@@ -1,0 +1,18 @@
+# Protect data directory from direct web access
+<Files "data/*">
+    Order Deny,Allow
+    Deny from all
+</Files>
+
+# Alternative method for protecting data directory
+RedirectMatch 404 ^/calculator/data/.*$
+
+# Prevent access to .csv files
+<FilesMatch "\.csv$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Optional: Enable error logging
+# php_flag log_errors on
+# php_value error_log /path/to/error.log

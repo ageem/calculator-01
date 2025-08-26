@@ -1,0 +1,35 @@
+# Data files (contains sensitive user information)
+data/
+*.csv
+*.backup.*
+
+# Log files
+*.log
+error_log
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Development documentation (not needed in repo)
+assistant-guidelines.md
+deployment_instructions.md
+
+# Backup files
+*.bak
+*.backup
