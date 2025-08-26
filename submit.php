@@ -3,6 +3,15 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Include PHPMailer
+require_once 'PHPMailer-master/PHPMailer-master/src/Exception.php';
+require_once 'PHPMailer-master/PHPMailer-master/src/PHPMailer.php';
+require_once 'PHPMailer-master/PHPMailer-master/src/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
@@ -191,13 +200,6 @@ $email_body .= "</div>
 </body>
 </html>";
 
-// Email headers - use a more reliable From address
-$headers = "MIME-Version: 1.0" . "\r\n";
-$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-$headers .= "From: IT Legend Calculator <noreply@mikeagee.com>" . "\r\n";
-$headers .= "Reply-To: {$sanitized_data['email']}" . "\r\n";
-$headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
-
 // Check if we're running locally
 $is_local = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) || 
             (strpos($_SERVER['HTTP_HOST'], '127.0.0.1') !== false) ||
@@ -207,30 +209,63 @@ $is_local = (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) ||
 error_log("HTTP_HOST: " . $_SERVER['HTTP_HOST']);
 error_log("Is local: " . ($is_local ? 'true' : 'false'));
 
-// Send email (skip for local testing)
+// Send email using PHPMailer
 $email_sent = false;
+$email_error = '';
+$email_method = 'unknown';
+
 if (!$is_local) {
     // Add detailed email debugging for production
     error_log("PRODUCTION - Attempting to send email to: mikeagee@gmail.com");
     error_log("Subject: " . $subject);
-    error_log("From header: noreply@" . $_SERVER['HTTP_HOST']);
     
-    // Try both methods - mail() and a backup method
-    $email_sent = mail('mikeagee@gmail.com', $subject, $email_body, $headers);
-    
-    // Also try with additional parameters for DreamHost
-    if (!$email_sent) {
-        $additional_params = '-f noreply@mikeagee.com';
-        $email_sent = mail('mikeagee@gmail.com', $subject, $email_body, $headers, $additional_params);
-        error_log("Retry with additional params: " . ($email_sent ? 'SUCCESS' : 'FAILED'));
-    }
-    
-    error_log("Mail function result: " . ($email_sent ? 'SUCCESS' : 'FAILED'));
-    
-    if (!$email_sent) {
-        $last_error = error_get_last();
-        if ($last_error) {
-            error_log("Last PHP error: " . $last_error['message']);
+    try {
+        // Create a new PHPMailer instance
+        $mail = new PHPMailer(true);
+        
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host = 'localhost'; // Use local SMTP server
+        $mail->SMTPAuth = false; // No authentication for localhost
+        $mail->Port = 25; // Standard SMTP port
+        
+        // Recipients
+        $mail->setFrom('noreply@mikeagee.com', 'IT Legend Calculator');
+        $mail->addAddress('mikeagee@gmail.com');
+        $mail->addReplyTo($sanitized_data['email'], $sanitized_data['firstName'] . ' ' . $sanitized_data['lastName']);
+        
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body = $email_body;
+        $mail->CharSet = 'UTF-8';
+        
+        // Send the email
+        $email_sent = $mail->send();
+        $email_method = 'PHPMailer SMTP';
+        error_log("PHPMailer result: SUCCESS - Email sent via PHPMailer SMTP");
+        
+    } catch (Exception $e) {
+        $email_error = "PHPMailer Error: " . $e->getMessage();
+        error_log($email_error);
+        
+        // Fallback to original mail() function if PHPMailer fails
+        error_log("Attempting fallback to mail() function");
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+        $headers .= "From: IT Legend Calculator <noreply@mikeagee.com>" . "\r\n";
+        $headers .= "Reply-To: {$sanitized_data['email']}" . "\r\n";
+        $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
+        
+        $email_sent = mail('mikeagee@gmail.com', $subject, $email_body, $headers);
+        $email_method = $email_sent ? 'PHP mail() function' : 'unknown';
+        error_log("Fallback mail() attempt 1: " . ($email_sent ? 'SUCCESS' : 'FAILED'));
+        
+        if (!$email_sent) {
+            $additional_params = '-f noreply@mikeagee.com';
+            $email_sent = mail('mikeagee@gmail.com', $subject, $email_body, $headers, $additional_params);
+            $email_method = $email_sent ? 'PHP mail() function (with params)' : 'unknown';
+            error_log("Fallback mail() attempt 2: " . ($email_sent ? 'SUCCESS' : 'FAILED'));
         }
     }
 } else {
@@ -239,6 +274,7 @@ if (!$is_local) {
     error_log("Subject: " . $subject);
     error_log("Body length: " . strlen($email_body) . " characters");
     $email_sent = true; // Simulate success for local testing
+    $email_method = 'Local testing (simulated)';
 }
 
 // Save to CSV file
@@ -313,17 +349,29 @@ if ($email_sent && $csv_success) {
         'message' => $is_local ? 'Local test: Submission processed successfully' : 'Submission received successfully',
         'csv_saved' => $csv_success,
         'email_sent' => $email_sent,
-        'local_testing' => $is_local
+        'local_testing' => $is_local,
+        'email_method' => $email_method
     ]);
 } else {
+    $error_message = 'Submission processed with issues: ';
+    if (!$email_sent) {
+        $error_message .= 'Email failed. ';
+        if (!empty($email_error)) {
+            $error_message .= $email_error . ' ';
+        }
+    }
+    if (!$csv_success) {
+        $error_message .= 'CSV save failed: ' . $csv_error;
+    }
+    
     echo json_encode([
         'success' => false, 
-        'message' => 'Submission processed with issues: ' . 
-                    (!$email_sent ? 'Email failed. ' : '') . 
-                    (!$csv_success ? 'CSV save failed: ' . $csv_error : ''),
+        'message' => $error_message,
         'csv_saved' => $csv_success,
         'email_sent' => $email_sent,
-        'local_testing' => $is_local
+        'local_testing' => $is_local,
+        'email_error' => $email_error,
+        'email_method' => $email_method
     ]);
 }
 ?>
