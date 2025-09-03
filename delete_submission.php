@@ -4,19 +4,29 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
-// Basic security - same as get_submissions.php
-// Uncomment the lines below to add password protection
-/*
-$dashboard_password = 'your_secure_password_here';
-if (!isset($_POST['password']) && !isset($_GET['password'])) {
-    $password = json_decode(file_get_contents('php://input'), true)['password'] ?? '';
-    if ($password !== $dashboard_password) {
+// Basic security - password protection (must match get_submissions.php)
+$dashboard_password = 'Cr@yon-IT-L3g3nd!';
+$providedPassword = null;
+
+// Support JSON body or form/query param
+if ($_SERVER['CONTENT_TYPE'] === 'application/json') {
+    $jsonInput = json_decode(file_get_contents('php://input'), true);
+    if (is_array($jsonInput) && isset($jsonInput['password'])) {
+        $providedPassword = $jsonInput['password'];
+    }
+    // Reset php://input for later use
+    $GLOBALS['HTTP_RAW_POST_DATA'] = $jsonInput;
+} else {
+    $providedPassword = $_POST['password'] ?? $_GET['password'] ?? null;
+}
+
+if ($dashboard_password !== '') {
+    if ($providedPassword !== $dashboard_password) {
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
         exit();
     }
 }
-*/
 
 // Only accept POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -25,9 +35,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Get JSON input
-$input = file_get_contents('php://input');
-$data = json_decode($input, true);
+// Get JSON input (reuse parsed body if available)
+if (isset($GLOBALS['HTTP_RAW_POST_DATA']) && is_array($GLOBALS['HTTP_RAW_POST_DATA'])) {
+    $data = $GLOBALS['HTTP_RAW_POST_DATA'];
+} else {
+    $input = file_get_contents('php://input');
+    $data = json_decode($input, true);
+}
 
 if (!$data) {
     http_response_code(400);

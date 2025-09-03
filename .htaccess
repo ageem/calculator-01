@@ -1,11 +1,28 @@
-# Protect data directory from direct web access
+RewriteEngine On
+
+# Base directory (if your site is in a subdirectory)
+# RewriteBase /calc-test-02/
+
+# Remove .html extension from URLs
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^\.]+)$ $1.html [NC,L]
+
+# Specific redirect for dashboard (both with and without trailing slash)
+RewriteRule ^dashboard/?$ dashboard.html [NC,L]
+
+# Ensure PHP files are accessible
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^.*$ - [L]
+
+# Security: Protect data directory from direct web access
 <Files "data/*">
     Order Deny,Allow
     Deny from all
 </Files>
 
 # Alternative method for protecting data directory
-RedirectMatch 404 ^/calculator/data/.*$
+RedirectMatch 404 ^/data/.*$
 
 # Prevent access to .csv files
 <FilesMatch "\.csv$">

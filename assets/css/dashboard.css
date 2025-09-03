@@ -1,0 +1,238 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #000000;
+    min-height: 100vh;
+    padding: 2rem;
+    color: #ffffff;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem 0;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #ff6b4c;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    font-size: 1.1rem;
+    color: #94a3b8;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(10, 85, 101, 0.1);
+    border-left: 4px solid #FF370F;
+}
+
+.stat-card h3 {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #0A5565;
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+
+.stat-card .value {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #FF370F;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.table-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    overflow-x: auto;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.table-header h2 {
+    font-size: 1.5rem;
+    color: #e2e8f0;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.refresh-btn {
+    background: #FF370F;
+    color: white;
+}
+
+.refresh-btn:hover {
+    background: #E5310E;
+}
+
+.export-btn {
+    background: #0A5565;
+    color: white;
+}
+
+.export-btn:hover {
+    background: #08454A;
+}
+
+.refresh-btn:disabled {
+    background: #94a3b8 !important;
+    cursor: not-allowed;
+}
+
+.last-updated {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-left: 1rem;
+    font-style: italic;
+}
+
+.delete-btn {
+    background: #dc2626;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+.delete-btn:hover {
+    background: #b91c1c;
+}
+
+.actions-column {
+    width: 80px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    color: #e2e8f0;
+}
+
+th, td {
+    padding: 1rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+th {
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 700;
+    color: #ff6b4c;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.8rem;
+    position: sticky;
+    top: 0;
+}
+
+tr:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.timestamp {
+    font-family: monospace;
+    font-size: 0.85rem;
+}
+
+.impact-value {
+    font-weight: 700;
+    color: #ff6b4c;
+}
+
+.pain-points, .technologies {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pain-points:hover, .technologies:hover {
+    white-space: normal;
+    overflow: visible;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #94a3b8;
+}
+
+.error {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #fca5a5;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    table {
+        font-size: 0.8rem;
+    }
+    
+    th, td {
+        padding: 0.5rem;
+    }
+}

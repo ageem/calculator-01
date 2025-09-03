@@ -9,16 +9,15 @@ header('Cache-Control: no-cache, no-store, must-revalidate');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-// Basic security - optional password protection
-// Uncomment the lines below to add password protection
-/*
-$dashboard_password = 'your_secure_password_here';
-if (!isset($_GET['password']) || $_GET['password'] !== $dashboard_password) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
-    exit();
+// Basic security - password protection (set your password here)
+$dashboard_password = 'Cr@yon-IT-L3g3nd!';
+if ($dashboard_password !== '') {
+    if (!isset($_GET['password']) || $_GET['password'] !== $dashboard_password) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+        exit();
+    }
 }
-*/
 
 // Only accept GET requests
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
