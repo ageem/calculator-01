@@ -10,7 +10,7 @@ header('Pragma: no-cache');
 header('Expires: 0');
 
 // Basic security - password protection (set your password here)
-$dashboard_password = 'Cr@yon-IT-L3g3nd!';
+$dashboard_password = 'YOUR_DASHBOARD_PASSWORD';
 if ($dashboard_password !== '') {
     if (!isset($_GET['password']) || $_GET['password'] !== $dashboard_password) {
         http_response_code(401);

@@ -37,7 +37,7 @@
         // Add timestamp to prevent caching
         const cacheBuster = '?t=' + new Date().getTime();
         const pwd = getDashboardPassword();
-        const url = '/calc-test-02/get_submissions.php' + cacheBuster + (pwd ? ('&password=' + encodeURIComponent(pwd)) : '');
+        const url = 'get_submissions.php' + cacheBuster + (pwd ? ('&password=' + encodeURIComponent(pwd)) : '');
         
         console.log('Fetching from URL:', url); // Debug log
         
@@ -233,7 +233,7 @@
 
         // Send delete request to server
         const pwd = window.sessionStorage.getItem('dashboard_password') || '';
-        fetch('/calc-test-02/delete_submission.php', {
+        fetch('delete_submission.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

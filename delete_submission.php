@@ -5,7 +5,7 @@ header('Access-Control-Allow-Methods: POST');
 header('Access-Control-Allow-Headers: Content-Type');
 
 // Basic security - password protection (must match get_submissions.php)
-$dashboard_password = 'Cr@yon-IT-L3g3nd!';
+$dashboard_password = 'YOUR_DASHBOARD_PASSWORD';
 $providedPassword = null;
 
 // Support JSON body or form/query param

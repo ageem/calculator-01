@@ -26,9 +26,8 @@ Thumbs.db
 *.swp
 *.swo
 
-# Development documentation (not needed in repo)
-assistant-guidelines.md
-deployment_instructions.md
+# Markdown files (documentation)
+*.md
 
 # Backup files
 *.bak

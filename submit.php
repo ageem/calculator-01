@@ -223,15 +223,18 @@ if (!$is_local) {
         // Create a new PHPMailer instance
         $mail = new PHPMailer(true);
         
-        // Server settings
+        // Server settings (DreamHost authenticated SMTP)
         $mail->isSMTP();
-        $mail->Host = 'localhost'; // Use local SMTP server
-        $mail->SMTPAuth = false; // No authentication for localhost
-        $mail->Port = 25; // Standard SMTP port
+        $mail->Host = 'smtp.dreamhost.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = 'your-email@domain.com';
+        $mail->Password = 'YOUR_SMTP_PASSWORD';
+        $mail->SMTPSecure = 'tls'; // STARTTLS
+        $mail->Port = 587;
         
         // Recipients
-        $mail->setFrom('noreply@mikeagee.com', 'IT Legend Calculator');
-        $mail->addAddress('mikeagee@gmail.com');
+        $mail->setFrom('your-email@domain.com', 'IT Legend Calculator');
+        $mail->addAddress('your-email@domain.com');
         $mail->addReplyTo($sanitized_data['email'], $sanitized_data['firstName'] . ' ' . $sanitized_data['lastName']);
         
         // Content
@@ -257,13 +260,13 @@ if (!$is_local) {
         $headers .= "Reply-To: {$sanitized_data['email']}" . "\r\n";
         $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
         
-        $email_sent = mail('mikeagee@gmail.com', $subject, $email_body, $headers);
+        $email_sent = mail('your-email@domain.com', $subject, $email_body, $headers);
         $email_method = $email_sent ? 'PHP mail() function' : 'unknown';
         error_log("Fallback mail() attempt 1: " . ($email_sent ? 'SUCCESS' : 'FAILED'));
         
         if (!$email_sent) {
             $additional_params = '-f noreply@mikeagee.com';
-            $email_sent = mail('mikeagee@gmail.com', $subject, $email_body, $headers, $additional_params);
+            $email_sent = mail('your-email@domain.com', $subject, $email_body, $headers, $additional_params);
             $email_method = $email_sent ? 'PHP mail() function (with params)' : 'unknown';
             error_log("Fallback mail() attempt 2: " . ($email_sent ? 'SUCCESS' : 'FAILED'));
         }
